@@ -1,4 +1,63 @@
-var express = require('express');
+
+const express = require('express')
+const app = express()
+const port = 3000
+const multer = require('multer');
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.json());
+
+app.get('/', function(request, response){
+  response.send('Hello from Express!');
+});
+
+app.get('/stronzo', function(req, res){
+    res.send('LO STRONZO SEI TU');
+});
+
+
+app.listen(port, function(err) {
+  if (err) {
+    return console.log('something bad happened', err);
+  }
+
+  console.log('sto andando sulla porta 3000');
+});
+var Storage = multer.diskStorage({
+     destination: function(req, file, callback) {
+         callback(null, "./images");
+     },
+     filename: function(req, file, callback) {
+         callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+     }
+ });
+
+
+
+var upload = multer({
+     storage: Storage
+ }).array("imgUploader", 3);
+
+
+ app.get("/", function(req, res) {
+     res.sendFile(__dirname + "/index.html");
+ });
+
+ app.post("/uploadImages", function(req, res) {
+     upload(req, res, function(err) {
+         if (err) {
+             return res.end("Something went wrong!");
+         }
+         return res.end("File uploaded sucessfully!.");
+
+	});
+});
+
+
+
+
+
+/*var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -44,3 +103,4 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+*/
