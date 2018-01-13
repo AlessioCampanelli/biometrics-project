@@ -7,7 +7,10 @@ const bodyParser = require('body-parser');
 
 app.use(bodyParser.json());
 
-app.get('/', function(request, response){
+app.use('/public', express.static('public'));
+
+app.get('/faceRecognition', function(request, response){
+
   response.send('Hello from Express!');
 });
 
@@ -43,16 +46,15 @@ var upload = multer({
      res.sendFile(__dirname + "/index.html");
  });
 
+
  app.post("/uploadImages", function(req, res) {
      upload(req, res, function(err) {
          if (err) {
              return res.end("Something went wrong!");
          }
          return res.end("File uploaded sucessfully!.");
-
-	});
-});
-
+     });
+ });
 
 
 
