@@ -9,8 +9,11 @@ var User = require('./models/User');
 
     User.find({username: username}, function(err, userFound) {
 
-        if(err) return res.status(200).json({status:'KO', message:'ops, ' + err, listDoc: ''});
+        if(err) return res.status(200).json({status:'KO', message:'ops, ' + err, listDocument: ''});
 
+        if(userFound.length==0 || userFound === null || userFound === undefined){
+       		return res.status(200).json({status:'OK', message:'List documents empty', listDocument:[]});
+        }
         return res.status(200).json({status:'OK', message:'List documents', listDocument: userFound[0].listDocument});
     });
  });

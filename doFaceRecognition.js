@@ -19,6 +19,7 @@ const getFaceImage = (grayImg) => {
   const faceRects = classifier.detectMultiScale(grayImg).objects;
   if (!faceRects.length) {
     throw new Error('failed to detect faces');
+
   }
   return grayImg.getRegion(faceRects[0]);
 };
@@ -56,16 +57,21 @@ var upload = multer({ storage: Storage }).any();
 	upload(req, res, function(err) {
 	    var username = req.body.username;
 	
-            if (err) {
-               if (err.code === 'ENOENT') {
-		return res.status(200).json({status:'KO_NOT_EXIST', message:'register before using app!'});
-		}
-                return res.status(200).json({status:'KO_GENERIC', message:'Something went wrong! '+err});
+        if (err) {
+        	if (err.code === 'ENOENT') {
+				return res.status(200).json({status:'KO_NOT_EXIST', message:'register before using app!'});
+			}
+            return res.status(200).json({status:'KO_GENERIC', message:'Something went wrong! '+err});
                 //return res.end("Something went wrong! " + err);
-            }
+        }
 	    //FACE RECOGNITION
-	   imgFiles = fs.readdirSync(imgsPath); 
-           recognitionPhase(username, res);
+	   	imgFiles = fs.readdirSync(imgsPath); 
+       
+	   	try{
+	   		recognitionPhase(username, res);
+	   	} catch (err) {
+  		    return res.status(200).json({status:'KO', message:'Failed to detect face! Retry with your face.'});
+		}
 	
      });
  });
@@ -100,12 +106,12 @@ function recognitionPhase(username, res){
 	console.log("labels: "+labels)
 
 	//TRAINING
-	const eigen = new cv.EigenFaceRecognizer();
+	//const eigen = new cv.EigenFaceRecognizer();
 	//const fisher = new cv.FisherFaceRecognizer();
-	//const lbph = new cv.LBPHFaceRecognizer();
-	eigen.train(trainImages, labels);
+	const lbph = new cv.LBPHFaceRecognizer();
+	//eigen.train(trainImages, labels);
 	//fisher.train(trainImages, labels);
-	//lbph.train(trainImages, labels);
+	lbph.train(trainImages, labels);
 
 
 
@@ -154,8 +160,55 @@ function recognitionPhase(username, res){
 
 
 
-	console.log('eigen:');
-	runPrediction(eigen, function(statusResp){
+	//console.log('eigen:');
+	// runPrediction(eigen, function(statusResp){
+	//     console.log('Post callback - statusResp '+statusResp);
+     
+ //            fs.unlinkSync(pathImg_username + '/' + username + '4.jpg', function(errRemove){
+	// 	if(errRemove)
+	// 	 return res.status(200).json({status:'KO', message:'ops! Something went wrong '+ errRemove  });
+	//     });	   
+      
+	//     if(statusResp === "OK"){
+ //                        return res.status(200).json({status:'OK', message:'you are '+username});
+ //            }else if(statusResp=== "RETRY"){
+ //                        return res.status(200).json({status:'KO', message:'ops! you aren\'t '+username+ ' retry'});
+
+ //            }else if(statusResp=== "KO_NOT_EXIST"){
+ //                        return res.status(200).json({status:'KO_NOT_EXIST', message:'register before use the app'});
+
+ //            }else{
+ //                        return res.status(200).json({status:'KO', message:'ops! you aren\'t '+username });
+ //            }
+
+	// });
+
+	// console.log('fisher:');
+	// runPrediction(fisher, function(statusResp){
+	//     console.log('Post callback - statusResp '+statusResp);
+     
+ //            fs.unlinkSync(pathImg_username + '/' + username + '4.jpg', function(errRemove){
+	// 	if(errRemove)
+	// 	 return res.status(200).json({status:'KO', message:'ops! Something went wrong '+ errRemove  });
+	//     });	   
+      
+	//     if(statusResp === "OK"){
+ //                        return res.status(200).json({status:'OK', message:'you are '+username});
+ //            }else if(statusResp=== "RETRY"){
+ //                        return res.status(200).json({status:'KO', message:'ops! you aren\'t '+username+ ' retry'});
+
+ //            }else if(statusResp=== "KO_NOT_EXIST"){
+ //                        return res.status(200).json({status:'KO_NOT_EXIST', message:'register before use the app'});
+
+ //            }else{
+ //                        return res.status(200).json({status:'KO', message:'ops! you aren\'t '+username });
+ //            }
+
+	// });
+
+
+	//console.log('lbph:');
+	runPrediction(lbph, function(statusResp){
 	    console.log('Post callback - statusResp '+statusResp);
      
             fs.unlinkSync(pathImg_username + '/' + username + '4.jpg', function(errRemove){
@@ -176,12 +229,6 @@ function recognitionPhase(username, res){
             }
 
 	});
-
-	//console.log('fisher:');
-	//runPrediction(fisher);
-
-	//console.log('lbph:');
-	//runPrediction(lbph);
 	 
 
 }
