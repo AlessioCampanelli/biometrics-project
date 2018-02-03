@@ -11,7 +11,7 @@ var Storage = multer.diskStorage({
      },
      filename: function(req, file, callback) {
         console.log("file ", file);
-        
+
         currentDocToSave = file.originalname;
 
         callback(null, file.originalname);
@@ -37,18 +37,29 @@ router.get("/", function(req, res) {
             if(err) return res.status(200).json({status:'KO', message:'ops! ' + err, listDoc: ''});
 
             var tempDoc = [];
-            
-            if(!userFound){
+            var resultUser;
+            if(!userFound || userFound.length == 0){
+              console.log('user not found');
+
                 userFound = new User({
-                    'username':username
-                });   
+                    'username':username,
+                    'listDocument':[]
+                });
+                resultUser = userFound;
+                console.log('userFound created');
+
+
+            }else {
+              resultUser = userFound[0];
+              console.log('user just present');
+
             }
 
             //save path document in MongoDB
-            tempDoc = userFound.listDoc;
+            tempDoc = resultUser.listDocument;
             tempDoc.push(currentDocToSave);
-            userFound.listDoc = tempDoc;
-            userFound.save();
+            resultUser.listDocument = tempDoc;
+            resultUser.save();
 
             return res.status(200).json({status:'OK', message:'document correctly saved!'});
         });
@@ -56,4 +67,3 @@ router.get("/", function(req, res) {
  });
 
 module.exports = router;
-

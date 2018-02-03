@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 var sendPhotos = require('./sendPhotos');
 var doFaceRecognition = require('./doFaceRecognition');
 
-var insertUserDos = require('./insertUserDocs');
+var insertUserDocs = require('./insertUserDocs');
 var getUserDocs = require('./getUserDocs');
  
 var dbPath = 'mongodb://localhost/biometric-db';
@@ -49,5 +49,6 @@ app.listen(port, function(err) {
   }
   console.log('sto andando sulla porta 3000');
 });
+
 
 
