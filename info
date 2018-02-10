@@ -1,0 +1,10 @@
+#######UTILS
+
+------per problemi con mongo
+sudo rm /var/lib/mongodb/mongod.lock
+sudo mongod --dbpath /var/lib/mongodb/ --repair
+sudo mongod --dbpath /var/lib/mongodb/ --journal
+
+
+
+https://www.superdatascience.com/opencv-face-recognition/

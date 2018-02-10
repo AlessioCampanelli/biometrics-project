@@ -114,6 +114,11 @@ function recognitionPhase(username, res){
 	lbph.train(trainImages, labels);
 
 
+	//const THREESHOLD_RECOGNIZER = 2000;
+	const THREESHOLD_RECOGNIZER = 123; //LBPH
+	const ALGORITHM_NAME = "eigen";
+	//const ALGORITHM_NAME = "lbph";
+
 
  	var statusResp;
 	var l = testImages.length;
@@ -128,10 +133,10 @@ function recognitionPhase(username, res){
             console.log('name = '+name +' username= '+username);	    
 	    if(name === username){
                 found=true;           
-		
-		if(result.confidence === 0 || result.confidence <= 2000){
+		//eigen soglia 2000
+		if(result.confidence === 0 || result.confidence <= THREESHOLD_RECOGNIZER){
 			statusResp= "OK"; 
-		}else if(result.confidence > 2000){
+		}else if(result.confidence > THREESHOLD_RECOGNIZER){
 			statusResp="RETRY";		
 	        
 	        }else{
@@ -139,7 +144,7 @@ function recognitionPhase(username, res){
 	        }
  
 		console.log('Pre callback - statusResp '+statusResp);
-                callback(statusResp);
+                callback(statusResp,result.confidence);
                 return;
             }
             
@@ -151,7 +156,7 @@ function recognitionPhase(username, res){
 
           if(!found){
               statusResp ="KO_NOT_EXIST";
-              callback(statusResp);
+              callback(statusResp,result.confidence);
           }
 
 	};
@@ -160,28 +165,27 @@ function recognitionPhase(username, res){
 
 
 
-	//console.log('eigen:');
-	// runPrediction(eigen, function(statusResp){
-	//     console.log('Post callback - statusResp '+statusResp);
+	runPrediction(lbph, function(statusResp,confidence){
+	    console.log('Post callback - statusResp '+statusResp);
      
- //            fs.unlinkSync(pathImg_username + '/' + username + '4.jpg', function(errRemove){
-	// 	if(errRemove)
-	// 	 return res.status(200).json({status:'KO', message:'ops! Something went wrong '+ errRemove  });
-	//     });	   
+            fs.unlinkSync(pathImg_username + '/' + username + '4.jpg', function(errRemove){
+		if(errRemove)
+		 return res.status(200).json({status:'KO', message:'ops! Something went wrong '+confidence+' '+errRemove  });
+	    });	   
       
-	//     if(statusResp === "OK"){
- //                        return res.status(200).json({status:'OK', message:'you are '+username});
- //            }else if(statusResp=== "RETRY"){
- //                        return res.status(200).json({status:'KO', message:'ops! you aren\'t '+username+ ' retry'});
+	    if(statusResp === "OK"){
+                        return res.status(200).json({status:'OK', message:'you are '+username+' '+confidence});
+            }else if(statusResp=== "RETRY"){
+                        return res.status(200).json({status:'KO', message:'ops! you aren\'t '+username+' '+confidence+ ' retry'});
 
- //            }else if(statusResp=== "KO_NOT_EXIST"){
- //                        return res.status(200).json({status:'KO_NOT_EXIST', message:'register before use the app'});
+            }else if(statusResp=== "KO_NOT_EXIST"){
+                        return res.status(200).json({status:'KO_NOT_EXIST', message:'register before use the app'});
 
- //            }else{
- //                        return res.status(200).json({status:'KO', message:'ops! you aren\'t '+username });
- //            }
+            }else{
+                        return res.status(200).json({status:'KO', message:'ops! you aren\'t '+username+' '+confidence });
+            }
 
-	// });
+	 });
 
 	// console.log('fisher:');
 	// runPrediction(fisher, function(statusResp){
@@ -208,27 +212,27 @@ function recognitionPhase(username, res){
 
 
 	//console.log('lbph:');
-	runPrediction(lbph, function(statusResp){
-	    console.log('Post callback - statusResp '+statusResp);
+	// runPrediction(lbph, function(statusResp){
+	//     console.log('Post callback - statusResp '+statusResp);
      
-            fs.unlinkSync(pathImg_username + '/' + username + '4.jpg', function(errRemove){
-		if(errRemove)
-		 return res.status(200).json({status:'KO', message:'ops! Something went wrong '+ errRemove  });
-	    });	   
+ //            fs.unlinkSync(pathImg_username + '/' + username + '4.jpg', function(errRemove){
+	// 	if(errRemove)
+	// 	 return res.status(200).json({status:'KO', message:'ops! Something went wrong '+ errRemove  });
+	//     });	   
       
-	    if(statusResp === "OK"){
-                        return res.status(200).json({status:'OK', message:'you are '+username});
-            }else if(statusResp=== "RETRY"){
-                        return res.status(200).json({status:'KO', message:'ops! you aren\'t '+username+ ' retry'});
+	//     if(statusResp === "OK"){
+ //                        return res.status(200).json({status:'OK', message:'you are '+username});
+ //            }else if(statusResp=== "RETRY"){
+ //                        return res.status(200).json({status:'KO', message:'ops! you aren\'t '+username+ ' retry'});
 
-            }else if(statusResp=== "KO_NOT_EXIST"){
-                        return res.status(200).json({status:'KO_NOT_EXIST', message:'register before use the app'});
+ //            }else if(statusResp=== "KO_NOT_EXIST"){
+ //                        return res.status(200).json({status:'KO_NOT_EXIST', message:'register before use the app'});
 
-            }else{
-                        return res.status(200).json({status:'KO', message:'ops! you aren\'t '+username });
-            }
+ //            }else{
+ //                        return res.status(200).json({status:'KO', message:'ops! you aren\'t '+username });
+ //            }
 
-	});
+	// });
 	 
 
 }
