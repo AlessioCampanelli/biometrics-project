@@ -115,7 +115,7 @@ function recognitionPhase(username, res){
 
 
 	//const THREESHOLD_RECOGNIZER = 2000;
-	const THREESHOLD_RECOGNIZER = 123; //LBPH
+	const THREESHOLD_RECOGNIZER = 105; //LBPH
 	const ALGORITHM_NAME = "eigen";
 	//const ALGORITHM_NAME = "lbph";
 
